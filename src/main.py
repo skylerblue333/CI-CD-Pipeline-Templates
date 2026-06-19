@@ -1,34 +1,32 @@
-from fastapi import FastAPI
-import asyncio
+"""
+CI-CD-Pipeline-Templates: Pipeline template registry and validator
+"""
 import time
+from fastapi import FastAPI, HTTPException
+from pydantic import BaseModel
 
-app = FastAPI(title="CI-CD-Pipeline-Templates API", version="2.0.0")
+app = FastAPI(title="CI-CD-Pipeline-Templates", version="3.0.0")
 
-class Processor:
-    def __init__(self):
-        self.ready = False
-        self.items_processed = 0
-        
-    async def initialize(self):
-        await asyncio.sleep(0.1)
-        self.ready = True
-        
-    def process(self, data: dict) -> dict:
-        if not self.ready:
-            raise RuntimeError("Not initialized")
-        self.items_processed += 1
-        return {"status": "success", "processed": True, "domain": "templates", "data": data}
+class PipelineTemplate(BaseModel):
+    name: str
+    language: str
+    stages: list
+    triggers: list
 
-processor = Processor()
+templates = {}
 
-@app.on_event("startup")
-async def startup():
-    await processor.initialize()
+@app.post("/api/v1/templates")
+def create_template(t: PipelineTemplate):
+    templates[t.name] = t.dict()
+    return {"status": "created", "name": t.name}
+
+@app.get("/api/v1/templates/{name}")
+def get_template(name: str):
+    if name not in templates:
+        raise HTTPException(status_code=404, detail="Template not found")
+    return templates[name]
+
 
 @app.get("/health")
 def health():
-    return {"status": "ok", "ready": processor.ready, "processed": processor.items_processed}
-
-@app.post("/api/v1/process")
-def process_data(payload: dict):
-    return processor.process(payload)
+    return {"status": "healthy", "service": "CI-CD-Pipeline-Templates", "timestamp": int(time.time())}
