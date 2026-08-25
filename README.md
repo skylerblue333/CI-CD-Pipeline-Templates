@@ -1,44 +1,39 @@
-<!-- PORTFOLIO PROJECT PROFILE: maintained by the repository owner -->
+# Sky CI Template Catalog
 
-## Project profile and code-audit snapshot
+**Status: engineering beta / reusable examples.**
 
-**What this is:** **CI-CD-Pipeline-Templates** is a public repository described as: “Reusable GitHub Actions workflows for enterprise deployment. #SkyCoin4444 #AI #Blockchain #DevOps #Innovation” Its dominant language signals are **Python (4 files)**.
+This repository contains versionable GitHub Actions workflow templates for common SKYCOIN4444 engineering-lab stacks. The templates are intended to be copied and adapted into consuming repositories; they are not a hosted CI platform or a deployment service.
 
-**Why it has value:** Its value is best understood through the implementation evidence currently present in the repository: **18 tracked files** were observed in the shallow audit, with the source structure and existing documentation providing the project’s specific context. This README does not treat a prototype, experiment, or archive as a production system without supporting evidence.
+## Included templates
 
-**Implementation evidence:** 2 test-related file(s) detected; 2 dependency or package manifest(s) detected; 2 build/CI/infrastructure signal(s) detected; and 3 documentation or governance file(s) detected. Test filenames observed include `tests/__init__.py`, `tests/test_main.py`. Dependency or package files include `package.json`, `requirements.txt`. Build, CI, or infrastructure signals include `Dockerfile`, `.github/workflows/ci.yml`.
+- `templates/github-actions/node-ci.yml` — install, optional lint/typecheck/test/build, production dependency audit
+- `templates/github-actions/python-ci.yml` — compile, Ruff, pytest, pip-audit
+- `templates/github-actions/go-ci.yml` — gofmt, vet, race tests, build, govulncheck
+- `templates/github-actions/docker-ci.yml` — local image build plus non-root runtime-user check; never publishes
 
-**Current status:** The repository is tracked on the `main` branch. The existing source tree, configuration, tests, workflows, and documentation remain authoritative for supported behavior and maturity. A code audit is not a production-readiness certification, and the presence of a test or workflow file does not establish that all checks pass.
+All shipped templates default to `permissions: contents: read`, use explicit job timeouts, and avoid deployment credentials or publishing behavior.
 
-**Relationship to the wider portfolio:** This repository is one focused component of the broader Skyler Blue Spillers portfolio across AI, software engineering, cloud and DevOps, cybersecurity, blockchain, finance, education, social systems, and creative work. It may provide a service boundary, implementation pattern, experiment, archive, or reusable idea for related repositories. Treat repositories as technical dependencies only where documented interfaces and verified project requirements support that relationship.
+## Validate this catalog
 
-**Quality and security note:** No obvious secret-like pattern was detected by the limited static scan; this is not a substitute for a security audit. No TODO/FIXME marker was detected in the scanned text files.
+```bash
+python scripts/validate_templates.py
+```
 
----
+The repository CI runs the same structural policy check and rejects obvious private-key/AWS-access-key material in the template directory.
 
-# Ci Cd Pipeline Templates
+## Usage
 
-![GitHub stars](https://img.shields.io/github/stars/skylerblue333/CI-CD-Pipeline-Templates?style=flat-square)
-![GitHub license](https://img.shields.io/github/license/skylerblue333/CI-CD-Pipeline-Templates?style=flat-square)
+Copy a template into the consuming repository's `.github/workflows/` directory and review every command for that repository's package manager, test layout, runtime version, and threat model. Do not assume a template proves production readiness.
 
-## 🌟 Overview
-**CI-CD-Pipeline-Templates** is a professional-grade project within the **SkyCoin4444** ecosystem. It focuses on delivering high-value solutions in the domain of **Python**.
+Example:
 
-## 🚀 Key Features
-- **Scalable Architecture**: Designed for enterprise-level growth and performance.
-- **Modern Standards**: Implements best practices for clean code and maintainability.
-- **Robust Integration**: Built to work seamlessly within modern cloud-native environments.
+```bash
+mkdir -p .github/workflows
+cp templates/github-actions/go-ci.yml .github/workflows/ci.yml
+```
 
-## 🛠️ Technology Stack
-- **Primary Domain**: Python
-- **Ecosystem**: SkyCoin4444 Digital Platform
+## Security boundary
 
-## 📂 Structure
-The project is organized into a modular structure to ensure clarity and ease of development.
+These are examples, not centrally enforced organization policy. Consumers remain responsible for action pinning strategy, dependency provenance, secret access, environment approvals, branch protection, deployment authorization, runner trust, artifact signing, and repository-specific security gates.
 
-## 👨‍💻 Author
-**Skyler Blue Spillers**
-*Professional Chess Player & Software Engineer*
-
----
-*Powered by SkyCoin4444*
+No template in this repository deploys infrastructure or publishes an image by default.
