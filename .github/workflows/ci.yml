@@ -1,12 +1,25 @@
-name: CI
-on: [push, pull_request]
+name: template-catalog-ci
+on:
+  pull_request:
+  push:
+    branches: [main, "product/**"]
+
+permissions:
+  contents: read
+
 jobs:
-  test:
+  validate:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-python@v4
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
-      - run: pip install -r requirements.txt
-      - run: pytest tests/ -v
+          python-version: "3.12"
+      - name: Compile validator
+        run: python -m py_compile scripts/validate_templates.py
+      - name: Validate template policy
+        run: python scripts/validate_templates.py
+      - name: Reject obvious secret material in templates
+        run: |
+          ! grep -RniE '(BEGIN (RSA |EC |OPENSSH )?PRIVATE KEY|AKIA[0-9A-Z]{16})' templates/
